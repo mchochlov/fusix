@@ -1,8 +1,12 @@
 package co.fusix.versioncontrol;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -13,13 +17,19 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.DiffConfig;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Config;
+import org.eclipse.jgit.patch.FileHeader;
 import org.eclipse.jgit.revwalk.FollowFilter;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.treewalk.filter.PathSuffixFilter;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import co.fusix.component.Component;
 import co.fusix.corpus.Granularity;
@@ -89,13 +99,104 @@ public final class GitVersionControl implements VersionControl<BlobWalk> {
 							
 				if (blame == null) throw new NullPointerException(this.toString());
 
-				for (int i = component.getStartLine(); i <= component
-						.getEndLine(); i++) {
+				for (int i = component.getStartLine(); i <= component.getEndLine(); i++) {
 					commits.add(blame.getSourceCommit(i - 1));
 				}
 
 			} else if (recentness == Recentness.ALL) {
-				throw new UnsupportedOperationException("Annotation of method-level components with all historical change-sets is under construction.");
+				// walk the revision tree and find only those commits where file
+				// is modified
+				// for each relevant commit check if method was touched -> add
+				// changeset and
+				// modify function position if needed
+				Config config = new Config(git.getRepository().getConfig());
+				config.setString("diff", null, "renames", "copies");
+				config.setInt("diff", null, "renameLimit", Integer.MAX_VALUE);
+				DiffConfig diffConfig = config.get(DiffConfig.KEY);
+
+				try (RevWalk revWalk = new RevWalk(git.getRepository())) {
+					revWalk.markStart(revWalk.parseCommit(objectId));
+					revWalk.setTreeFilter(FollowFilter.create(component.getFilePath(), diffConfig));
+					Queue<RevCommit> qCommits = StreamSupport.stream(
+							revWalk.spliterator(), true).collect(
+							Collectors.toCollection(LinkedList::new));
+										
+					OutputStream outputStream = DisabledOutputStream.INSTANCE;
+					try (DiffFormatter formatter = new DiffFormatter(outputStream)) {
+						formatter.setRepository(git.getRepository());
+						formatter.setPathFilter(PathFilter.create(component.getFilePath()));
+						int startLine = component.getStartLine() - 1;
+						int endLine = component.getEndLine() - 1;
+						
+						RevCommit next = qCommits.poll();
+						//HACK
+						//commits.add(next);
+						//
+						while (next != null) {
+							RevCommit prev = qCommits.poll();
+							RevTree prevTree = prev == null ? null : prev.getTree();
+							List<DiffEntry> entries = formatter.scan(prevTree, next.getTree());
+								
+							if (entries != null && !entries.isEmpty()){
+								FileHeader fileHeader = formatter.toFileHeader(entries.get(0));
+								// fileHeader.toEditList().forEach(System.out::println);
+								int tstartLine = startLine;
+								int tendLine = endLine;
+								for (Edit edit : fileHeader.toEditList()) {
+									// check overlap of regionB and start end
+									if ((startLine >= edit.getBeginB() && startLine <= edit.getEndB())
+											|| (endLine >= edit.getBeginB() && endLine <= edit.getEndB())) {
+										commits.add(next);
+									}
+									// adjust position
+									// if a method is located after change or is
+									// included in a change
+									if (startLine >= edit.getBeginB()) {
+										switch (edit.getType()) {
+										case REPLACE:
+											startLine -= edit.getLengthB() - edit.getLengthA();
+											endLine -= edit.getLengthB() - edit.getLengthA();
+											break;
+										case DELETE:
+											startLine += edit.getLengthA();
+											endLine += edit.getLengthA();
+											break;
+										case INSERT:
+											startLine -= edit.getLengthB();
+											endLine -= edit.getLengthB();
+											break;
+										case EMPTY:
+										default:
+											throw new IllegalStateException("Unknown diff");
+										}
+									} else if (startLine < edit.getBeginB()	&& endLine >= edit.getBeginB()) {
+										switch (edit.getType()) {
+										case REPLACE:
+											endLine -= edit.getLengthB() - edit.getLengthA();
+											break;
+										case DELETE:
+											endLine += edit.getLengthA();
+											break;
+										case INSERT:
+											endLine -= edit.getLengthB();
+											break;
+										case EMPTY:
+										default:
+											throw new IllegalStateException("Unknown diff");
+										}
+									}
+								}
+								startLine = tstartLine;
+								endLine = tendLine;
+							}
+
+							next = prev;
+						}
+					}
+				}
+				//System.out.println(component.toString() + component.getStartLine() + "," + component.getEndLine());
+				//commits.forEach(System.out::println);
+			
 			}
 			
 			String content;
