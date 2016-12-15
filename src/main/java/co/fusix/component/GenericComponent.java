@@ -8,8 +8,17 @@ public final class GenericComponent extends Component {
 	private final int startLine;
 	private final int endLine;
 	private String content;
+	private int searchPosition;
 
 	
+	public int getSearchPosition() {
+		return searchPosition;
+	}
+
+	public void setSearchPosition(int searchPosition) {
+		this.searchPosition = searchPosition;
+	}
+
 	public GenericComponent(String path) {
 		this(path, EMPTY);
 	}

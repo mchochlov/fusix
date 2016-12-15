@@ -14,6 +14,7 @@ public abstract class Component {
 	
 	public abstract void addContent(String content);
 	
+	public abstract int getSearchPosition();
 	public abstract int getStartLine();
 	public abstract int getEndLine();
 	

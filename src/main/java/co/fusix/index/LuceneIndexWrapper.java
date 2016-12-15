@@ -119,8 +119,10 @@ public final class LuceneIndexWrapper implements Index {
 			ScoreDoc[] hits = results.scoreDocs;
 		
 			for (int i = 0; i < hits.length; i++) {
-				components.add(new GenericComponent(searcher.doc(hits[i].doc)
-						.get(Component.Fields.PATH.name())));
+				GenericComponent c = new GenericComponent(searcher.doc(hits[i].doc).get(Component.Fields.PATH.name()));
+				c.setSearchPosition( i + 1 );
+				components.add(c);
+				
 			}
 			return components;
 		} catch (IOException e) {
