@@ -24,7 +24,7 @@ public final class GenericComponent extends Component {
 	}
 	
 	public GenericComponent(String filePath, String content) {
-		this(filePath, content, 0, 0);
+		this(filePath, content, -1, -1);
 	}
 	
 	public GenericComponent(String filePath, int startLine, int endLine) {
@@ -64,7 +64,7 @@ public final class GenericComponent extends Component {
 
 	@Override
 	public String toString() {
-		return "GenericComponent [path=" + path + "]";
+		return "GenericComponent: " + searchPosition + " [path=" + path + "]";
 	}
 
 }

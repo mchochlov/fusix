@@ -14,6 +14,19 @@ import co.fusix.corpus.Source;
 
 public final class Utils {
 
+	
+	public static void main(String ... args) throws IOException{
+		String content = "public void print(List<Employee> employees) "
+				+ "{ "
+				+ "		Collections.sort(employees); "
+				+ "		for (Employee e : employees) "
+				+ "		{ "
+				+ "	 		System.out.println(e.toString()); "
+				+ "		} "
+				+ "} ";
+		preprocessString(content, getAnalyzer(Source.CODE)).forEach(System.out::println);
+	}
+	
 	private Utils(){}
 	
 	public static Analyzer getAnalyzer(Source source) throws IOException{

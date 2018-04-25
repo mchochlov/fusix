@@ -16,6 +16,7 @@ import co.fusix.exceptions.CorpusParserException;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -81,7 +82,7 @@ public final class SimpleJavaParser implements Parser {
 		
 		try {
 			visitor.visit(JavaParser.parse(in), path);
-		} catch (ParseException e) {
+		} catch (ParseException | TokenMgrError e) {
 			e.printStackTrace();
 		}
 		return components;

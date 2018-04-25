@@ -1,11 +1,23 @@
 package co.fusix.corpus;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import co.fusix.component.Component;
 import co.fusix.corpus.Configurations.Builder;
@@ -48,6 +60,7 @@ class GenericCorpus implements Corpus<List<String>> {
 			try (VersionControl<BlobWalk> vc = new GitVersionControl(srcDir, revision, filtered);
 					Index index = LuceneIndexWrapper.newWriteableInstance(indexDir, source) ) 
 			{
+				long start = System.currentTimeMillis();
 				List<String> log = new ArrayList<>();
 				log.add(this.toString());
 				log.add(index.toString());
@@ -62,15 +75,16 @@ class GenericCorpus implements Corpus<List<String>> {
 				while (blobWalk.next()) {
 					InputStream in = blobWalk.getBlob();
 					Set<Component> components = parser.parse(in, blobWalk.getPathString(), granularity, includeContent);
-					if(source == Source.VCS || source == Source.BOTH)
+					if (source == Source.VCS || source == Source.BOTH) {
 						vc.annotateAll(components, recentness, granularity);
-					
-					
+					}
 					index.writeAll(components);
+					
 					totalComponents += components.size();
 				}
 				log.add("Components size: " + totalComponents);
-				
+				long end = System.currentTimeMillis();
+				log.add("Total time sec.: " + (end - start) / ((double) 1000));
 				return log;
 			}
 		};	
