@@ -1,0 +1,75 @@
+delete should not throw an exception on unresolvable references
+Date.parse should attempt to parse string as toISOString format first
+Update Arguments object to match ES5 spec
+ArrayIndexOutOfBoundsException thrown in regexp.NativeRegExp.parseTerm when regex pattern includes a group (()) and ends with brace ({)
+Performance improvement for built-in JSON parser
+Make the source property of RegExp instances conform to the spec
+BOM should be treated as whitespace by the parser
+delete foo.prop should not walk the property chain to find prop
+Provide annotation based mechanism to implement host objects with ScriptableObject.defineClass()
+Rhino's new JSON.parse breaks on trailing whitespace
+Allow passing explicit synchronization object to sync(function)
+Failed to decompile expressions like "new Date()"
+Add option to allow setting... read only properties
+Rhino JS debugger: allow to configure a "source provider"
+ScriptableObject.defineClass fails if method is defined both static and non-static
+Setting the value of an uninitialized child of an E4X object by using square bracket syntax causes Null Pointer Exception
+String with escaped characters gives wrong toSource() output
+Array.prototype.map returns a 0-length array when this array has length > 0 but no elements
+should throw a RangeError when an array's length is set to >= 4294967296
+parseFloat fails on number followed by "e" that is not exponent
+"while(true) continue;" will never trigger observeInstructionCount
+parser constructs VariableInitializer with wrong end value, therefor VariableInitializer reports false length
+Asignment problems are reported as DomExceptions "NAMESPACE_ERR"
+JSON.parse doesn't correctly add properties with numeric identifiers
+Add (non ECMA) property "stack" to NativeError
+Parser does not complain about unclosed array literal
+Codegen uses wrong invoke opcode in generateFunctionConstructor
+Changes made to a node by its ordered position (using [0] for example) doensn't reflects in the tree
+Changes made in an inner node are lost when using intermediate variables
+TokenStream.getToken() does not return Token.COMMENT for HTML comments
+rhino crashes on fn.toString if "debugger" is in the function body.
+Repeated reflection warning due to lack of privileges
+Exception is thrown when setting a named namespace on an XML-object
+NativeIterator.jsConstructor throws ArrayIndexOutOfBoundsException
+support stack map generation for Java 6 bytecode
+eliminate use of jsr instruction for Java 6 bytecode
+SyntaxError with new Function('return true//')
+Incorrect error message for undefined[undefined]
+Function expression binding takes precedence over local bindings
+Java class wrapping not customizable via WrapFactory
+"0" and "-0" is regarded same object property
+Functionality of built-in classes is exposed to changes in global object
+Labeled while loops generate "no side effects" warning
+[ECMAScript5]decodeURI/decodeURIComponent should throw URIError for overlong UTF-8
+decodeURIComponent should throw URIError for '%ED%A0%80'
+AssertionError thrown when I use JavaAdaper in local scope (1.7R3)
+finally block executed more than 1 time when using continuation
+ArrayComprehensionLoop.toSource missing each keyword - patch included
+Calling toSource on a parsed script omits any empty expression - sample attached
+Calling toSource on a parsed script containing 'void' throws exception - sample attached
+Calling toSource on a parsed script containing debugger omits semi-colon - sample attached
+Calling toSource on a parsed script containing if without braces not indented - sample attached
+Race condition in ScriptableObject property table resizing
+Calling toSource on a parsed script containing array of undefined elements returns smaller array - sample attached
+Calling toSource on a parsed script containing lambda returns extra return and semi-colon - sample attached
+Boolean converted to number when optimising
+Label nodes produce negative lengths
+Destructuring Assignment does not allow 'this'
+Rhino AST infinite loop when parsing incomplete array declarations
+Invalid operand for "in" operator returns wrong error message
+"delete" operator does not evaluate embedded expressions
+Array.sort does not always call function arg
+Destructuring assignment doesn't work for expression closures parameters
+org.mozilla.javascript.ClassCache non thread-safe use of HashMap with 1.7R3
+RegExp literals are instantiated only once per script/function
+Object(Object.prototype) causes an infinite loop
+Converting function to string removes labeled block (1_7R4)
+'in' operator in middle clause of a ternary not allowed
+ScriptRuntime.notFunctionError(Object,Object,String) uses wrong object representation for functions with object destructuring parameters
+Interactive shell line editing broken with recent JLine
+Array.prototype.sort changes non-existent elements to undefined elements
+VerifyError for --a[i]() or --a(i) with opt=9
+Math.IEEEremainder makes ToInt32 slow for non-integer values
+Increment/Decrement alters const variables
+Defining const variable within eval() throws redeclaration error
